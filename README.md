@@ -27,13 +27,6 @@ Sử dụng học sâu để định nghĩa ngữ nghĩa cho các đối tượn
 * **YOLOv8**: Phát hiện và phân loại các vật thể thời gian thực như `car`, `person`, `truck`, `traffic light`,...
 * **Tích hợp**: Sử dụng tọa độ vật thể từ YOLO để loại bỏ các biên giả trong quá trình phân tích hình học.
 
-## 🛠 Công nghệ sử dụng
-
-* **OpenCV-Python**: Xử lý ảnh và thị giác máy tính truyền thống.
-* **NumPy**: Phép toán ma trận và tính toán số học hiệu suất cao.
-* **Ultralytics YOLOv8**: Framework nhận diện vật thể State-of-the-art.
-* **Matplotlib**: Trực quan hóa dữ liệu và kết quả thực nghiệm.
-
 ## 📂 Cấu trúc thư mục
 
 ```text
@@ -72,10 +65,16 @@ Cài đặt các thư viện cần thiết qua file requirements.txt:
 pip install -r requirements.txt
 ```
 
+### 3. Sử dụng
+Chạy các notebooks bằng `jupyter lab`.
+```bash
+jupyter lab
+```
+
 ### 3. Thực thi quy trình
 - Để thực thi mở các notebooks và chạy chúng (theo thứ tự 01, 02, 03).
-- Kết quả sẽ được lưu tại resutls/.
-- Các file trong src/ chỉ mang tính chất lưu trữ cho tái sử dụng.
+- Kết quả sẽ được lưu tại `resutls/`.
+- Các file trong `src/` chỉ mang tính chất lưu trữ cho tái sử dụng.
 
 ## 📈 Hướng phát triển tương lai
 - Dự án hiện tại đã xây dựng được nền tảng vững chắc. Các hướng phát triển tiếp theo bao gồm:
