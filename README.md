@@ -73,11 +73,9 @@ pip install -r requirements.txt
 ```
 
 ### 3. Thực thi quy trình
-- Hệ thống được thiết kế theo dạng module, bạn có thể chạy quy trình hoàn chỉnh trong thư mục notebooks/:
-- Mở file main_pipeline.ipynb.
-- Chạy toàn bộ các cell để xem quy trình từ ảnh thô đến kết quả cuối cùng.
-- Kết quả sẽ được lưu tự động vào thư mục results/Images/.
-
+- Để thực thi mở các notebooks và chạy chúng (theo thứ tự 01, 02, 03).
+- Kết quả sẽ được lưu tại resutls/.
+- Các file trong src/ chỉ mang tính chất lưu trữ cho tái sử dụng.
 
 ## 📈 Hướng phát triển tương lai
 - Dự án hiện tại đã xây dựng được nền tảng vững chắc. Các hướng phát triển tiếp theo bao gồm:
