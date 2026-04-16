@@ -54,38 +54,37 @@ Sử dụng học sâu để định nghĩa ngữ nghĩa cho các đối tượn
 ### 1. Chuẩn bị môi trường
 Dự án yêu cầu **Python 3.8+**. Khuyến khích sử dụng môi trường ảo:
 
-```bash
 # Tạo và kích hoạt môi trường ảo
+```bash
 python -m venv venv
+```
 # Windows:
+```bash
 venv\Scripts\activate
+```
 # Linux/MacOS:
+```bash
 source venv/bin/activate
-2. Cài đặt thư viện
+```
+### 2. Cài đặt thư viện
 Cài đặt các thư viện cần thiết qua file requirements.txt:
-
-Bash
+```bash
 pip install -r requirements.txt
-3. Thực thi quy trình
-Hệ thống được thiết kế theo dạng module, bạn có thể chạy quy trình hoàn chỉnh trong thư mục notebooks/:
+```
 
-Mở file main_pipeline.ipynb.
+### 3. Thực thi quy trình
+- Hệ thống được thiết kế theo dạng module, bạn có thể chạy quy trình hoàn chỉnh trong thư mục notebooks/:
+- Mở file main_pipeline.ipynb.
+- Chạy toàn bộ các cell để xem quy trình từ ảnh thô đến kết quả cuối cùng.
+- Kết quả sẽ được lưu tự động vào thư mục results/Images/.
 
-Chạy toàn bộ các cell để xem quy trình từ ảnh thô đến kết quả cuối cùng.
 
-Kết quả sẽ được lưu tự động vào thư mục results/Images/.
+### 📈 Hướng phát triển tương lai
+- Dự án hiện tại đã xây dựng được nền tảng vững chắc. Các hướng phát triển tiếp theo bao gồm:
+- Hợp nhất dữ liệu nâng cao (Sensor Fusion): Kết hợp tọa độ YOLO và đường thẳng Hough để xác định chính xác vật thể đang nằm ở làn đường nào (Làn trái, phải hay lấn làn).
+- Ước tính khoảng cách (Distance Estimation): Sử dụng điểm tụ (vanishing point) và kích thước thực tế của vật thể để tính toán khoảng cách an toàn.
+- Theo dõi vật thể (Tracking): Tích hợp DeepSORT để theo dõi quỹ đạo di chuyển của các phương tiện theo thời gian thực.
+- Semantic Segmentation: Áp dụng phân đoạn ngữ nghĩa để nhận diện bề mặt đường ở những nơi không có vạch kẻ rõ ràng.
 
-
-📈 Hướng phát triển tương lai
-Dự án hiện tại đã xây dựng được nền tảng vững chắc. Các hướng phát triển tiếp theo bao gồm:
-
-Hợp nhất dữ liệu nâng cao (Sensor Fusion): Kết hợp tọa độ YOLO và đường thẳng Hough để xác định chính xác vật thể đang nằm ở làn đường nào (Làn trái, phải hay lấn làn).
-
-Ước tính khoảng cách (Distance Estimation): Sử dụng điểm tụ (vanishing point) và kích thước thực tế của vật thể để tính toán khoảng cách an toàn.
-
-Theo dõi vật thể (Tracking): Tích hợp DeepSORT để theo dõi quỹ đạo di chuyển của các phương tiện theo thời gian thực.
-
-Semantic Segmentation: Áp dụng phân đoạn ngữ nghĩa để nhận diện bề mặt đường ở những nơi không có vạch kẻ rõ ràng.
-
-🛠 Công nghệ sử dụng
+### 🛠 Công nghệ sử dụng
 OpenCV-Python, NumPy, Ultralytics YOLOv8, Matplotlib.
