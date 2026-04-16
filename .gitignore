@@ -30,6 +30,7 @@ notebooks/.ipynb_checkpoints
 venv/
 # Environments
 .env
+.env/
 .venv
 env/
 
