@@ -54,15 +54,15 @@ Sử dụng học sâu để định nghĩa ngữ nghĩa cho các đối tượn
 ### 1. Chuẩn bị môi trường
 Dự án yêu cầu **Python 3.8+**. Khuyến khích sử dụng môi trường ảo:
 
-# Tạo và kích hoạt môi trường ảo
+* Tạo và kích hoạt môi trường ảo
 ```bash
 python -m venv venv
 ```
-# Windows:
+* Windows:
 ```bash
 venv\Scripts\activate
 ```
-# Linux/MacOS:
+* Linux/MacOS:
 ```bash
 source venv/bin/activate
 ```
@@ -79,12 +79,12 @@ pip install -r requirements.txt
 - Kết quả sẽ được lưu tự động vào thư mục results/Images/.
 
 
-### 📈 Hướng phát triển tương lai
+## 📈 Hướng phát triển tương lai
 - Dự án hiện tại đã xây dựng được nền tảng vững chắc. Các hướng phát triển tiếp theo bao gồm:
 - Hợp nhất dữ liệu nâng cao (Sensor Fusion): Kết hợp tọa độ YOLO và đường thẳng Hough để xác định chính xác vật thể đang nằm ở làn đường nào (Làn trái, phải hay lấn làn).
 - Ước tính khoảng cách (Distance Estimation): Sử dụng điểm tụ (vanishing point) và kích thước thực tế của vật thể để tính toán khoảng cách an toàn.
 - Theo dõi vật thể (Tracking): Tích hợp DeepSORT để theo dõi quỹ đạo di chuyển của các phương tiện theo thời gian thực.
 - Semantic Segmentation: Áp dụng phân đoạn ngữ nghĩa để nhận diện bề mặt đường ở những nơi không có vạch kẻ rõ ràng.
 
-### 🛠 Công nghệ sử dụng
+## 🛠 Công nghệ sử dụng
 OpenCV-Python, NumPy, Ultralytics YOLOv8, Matplotlib.
