@@ -7,7 +7,7 @@ def detect_edges(img_gray, low_thresh=50, high_thresh=180):
     edges = cv2.Canny(img_gray, low_thresh, high_thresh)
     return edges
 
-def get_lines (edges_img, threshold=70, minLineLength=80, maxLineGap=80):
+def get_lines (edges_img, threshold=60, minLineLength=80, maxLineGap=80):
     return cv2.HoughLinesP(
         edges_img, 
         1, 
@@ -18,7 +18,7 @@ def get_lines (edges_img, threshold=70, minLineLength=80, maxLineGap=80):
     )
 
 
-def filter_lines_by_length(lines, min_len=60, max_len=600):
+def filter_lines_by_length(lines, min_len=60, max_len=400):
     """
     Lọc đường thẳng dựa trên độ dài (Euclidean distance).
     Loại bỏ các đường quá ngắn (nhiễu) hoặc quá dài (vết nứt ngang đường).
@@ -59,7 +59,7 @@ def apply_roi_mask(img, upper_limit=0.4):
     return masked_image
 
 
-def filter_lines_by_angle(lines, min_angle=20, max_angle=80):
+def filter_lines_by_angle(lines, min_angle=20, max_angle=85):
     """
     Lọc các đường thẳng dựa trên góc nghiêng (độ).
     min_angle, max_angle: Khoảng góc muốn giữ lại (ví dụ 20 đến 80 độ).
