@@ -6,6 +6,7 @@ Mở browser tại: http://localhost:7860
 
 import cv2
 import numpy as np
+import math
 import matplotlib
 matplotlib.use("Agg")  # non-interactive backend cho Gradio
 import matplotlib.pyplot as plt
@@ -16,30 +17,32 @@ import gradio as gr
 # ---------------------------------------------------------------------------
 # Load YOLO model một lần duy nhất khi khởi động
 # ---------------------------------------------------------------------------
-MODEL_PATH = "notebooks/yolov8n.pt"
+MODEL_PATH = "results/models/yolov8n.pt"
 yolo_model = YOLO(MODEL_PATH)
 
 # ---------------------------------------------------------------------------
-# Tiền xử lý
+# Tiền xử lý (khớp với src/data_handling.py)
 # ---------------------------------------------------------------------------
-def preprocess_gray(img_bgr, target_width=800, target_height=600, crop_margin=50):
+def preprocess_gray(img_bgr, target_width=400, target_height=400, crop_margin=50):
+    """Resize, crop, grayscale, CLAHE, medianBlur — khớp pipeline chính."""
     img = cv2.resize(img_bgr, (target_width, target_height))
     img = img[crop_margin:target_height - crop_margin, crop_margin:target_width - crop_margin]
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+    clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
     gray = clahe.apply(gray)
-    gray = cv2.GaussianBlur(gray, (5, 5), 0)
+    gray = cv2.medianBlur(gray, ksize=5)
     return gray
 
-def preprocess_rgb(img_bgr, target_width=800, target_height=600, crop_margin=50):
+def preprocess_rgb(img_bgr, target_width=400, target_height=400, crop_margin=50):
+    """Resize, crop và trả về ảnh RGB để hiển thị."""
     img = cv2.resize(img_bgr, (target_width, target_height))
     img = img[crop_margin:target_height - crop_margin, crop_margin:target_width - crop_margin]
     return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
 # ---------------------------------------------------------------------------
-# Phát hiện biên
+# Phát hiện biên (khớp với src/geometry_analysis.py)
 # ---------------------------------------------------------------------------
-def edge_canny(gray, low=100, high=250):
+def edge_canny(gray, low=50, high=180):
     return cv2.Canny(gray, low, high)
 
 def edge_sobel(gray):
@@ -56,27 +59,56 @@ def edge_laplacian(gray):
     return binary
 
 # ---------------------------------------------------------------------------
-# Phát hiện đường thẳng
+# Phát hiện đường thẳng (khớp với src/geometry_analysis.py)
 # ---------------------------------------------------------------------------
-def region_of_interest(img):
+def region_of_interest(img, upper_limit=0.4):
     h, w = img.shape
     mask = np.zeros_like(img)
-    poly = np.array([[(0, h), (w, h), (w, int(h * 0.3)), (0, int(h * 0.3))]])
+    start_y = int(h * upper_limit)
+    poly = np.array([[(0, h), (w, h), (w, start_y), (0, start_y)]])
     cv2.fillPoly(mask, poly, 255)
     return cv2.bitwise_and(img, mask)
+
+def filter_lines_by_length(lines, min_len=60, max_len=400):
+    if lines is None:
+        return None
+    filtered = []
+    for line in lines:
+        x1, y1, x2, y2 = line[0]
+        length = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+        if min_len <= length <= max_len:
+            filtered.append(line)
+    return filtered if filtered else None
+
+def filter_lines_by_angle(lines, min_angle=20, max_angle=85):
+    if lines is None:
+        return None
+    filtered = []
+    for line in lines:
+        x1, y1, x2, y2 = line[0]
+        angle_deg = math.degrees(math.atan2(abs(y2 - y1), abs(x2 - x1)))
+        if min_angle <= angle_deg <= max_angle:
+            filtered.append(line)
+    return filtered if filtered else None
 
 def draw_probabilistic_hough(edges, img_rgb):
     out = img_rgb.copy()
     lines = cv2.HoughLinesP(edges, 1, np.pi / 180,
-                            threshold=150, minLineLength=220, maxLineGap=80)
+                            threshold=60, minLineLength=80, maxLineGap=80)
+    lines = filter_lines_by_length(lines)
+    lines = filter_lines_by_angle(lines)
+    n = 0
     if lines is not None:
-        for x1, y1, x2, y2 in lines[:, 0]:
+        for line in lines:
+            x1, y1, x2, y2 = line[0]
             cv2.line(out, (x1, y1), (x2, y2), (255, 0, 0), 2)
-    return out
+            n += 1
+    return out, n
 
 def draw_standard_hough(edges, img_rgb):
     out = img_rgb.copy()
     lines = cv2.HoughLines(edges, 1, np.pi / 180, threshold=120)
+    n = 0
     if lines is not None:
         for rho, theta in lines[:, 0]:
             a, b = np.cos(theta), np.sin(theta)
@@ -84,7 +116,8 @@ def draw_standard_hough(edges, img_rgb):
             x1, y1 = int(x0 + 1000 * (-b)), int(y0 + 1000 * a)
             x2, y2 = int(x0 - 1000 * (-b)), int(y0 - 1000 * a)
             cv2.line(out, (x1, y1), (x2, y2), (0, 255, 0), 2)
-    return out
+            n += 1
+    return out, n
 
 # ---------------------------------------------------------------------------
 # Hàm chuyển figure matplotlib → PIL Image (để Gradio hiển thị)
@@ -102,22 +135,22 @@ def fig_to_pil(fig):
 def run_preprocessing(img_np):
     """Hiển thị 4 bước tiền xử lý."""
     img_bgr = cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR)
-    resized = cv2.resize(img_bgr, (800, 600))
+    resized = cv2.resize(img_bgr, (400, 400))
     margin = 50
-    cropped = resized[margin:600 - margin, margin:800 - margin]
+    cropped = resized[margin:400 - margin, margin:400 - margin]
     cropped_rgb = cv2.cvtColor(cropped, cv2.COLOR_BGR2RGB)
 
     gray = cv2.cvtColor(cropped, cv2.COLOR_BGR2GRAY)
-    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+    clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
     equalized = clahe.apply(gray)
-    denoised = cv2.GaussianBlur(equalized, (5, 5), 0)
+    denoised = cv2.medianBlur(equalized, ksize=5)
 
     fig, axes = plt.subplots(1, 4, figsize=(20, 4))
     fig.suptitle("Tiền xử lý ảnh", fontsize=14, fontweight="bold")
     for ax, img, title, cmap in zip(
         axes,
         [cropped_rgb, gray, equalized, denoised],
-        ["Ảnh gốc (crop)", "Grayscale", "CLAHE (cân bằng sáng)", "Gaussian Blur (giảm nhiễu)"],
+        ["Ảnh gốc (crop)", "Grayscale", "CLAHE (cân bằng sáng)", "Median Blur (giảm nhiễu)"],
         [None, "gray", "gray", "gray"],
     ):
         ax.imshow(img, cmap=cmap)
@@ -168,8 +201,8 @@ def run_line_comparison(img_np):
     edges = edge_canny(gray)
     roi = region_of_interest(edges)
 
-    prob = draw_probabilistic_hough(roi, original)
-    std  = draw_standard_hough(roi, original)
+    prob, n_prob = draw_probabilistic_hough(roi, original)
+    std, n_std   = draw_standard_hough(roi, original)
 
     fig, axes = plt.subplots(1, 3, figsize=(18, 4))
     fig.suptitle("So sánh Hough Transform", fontsize=14, fontweight="bold")
@@ -177,8 +210,8 @@ def run_line_comparison(img_np):
         axes,
         [original, prob, std],
         ["Ảnh gốc",
-         "Probabilistic HoughLinesP\n(đoạn thẳng, màu đỏ)",
-         "Standard HoughLines\n(đường vô hạn, màu xanh lá)"],
+         f"Probabilistic HoughLinesP\n({n_prob} đoạn, màu đỏ)",
+         f"Standard HoughLines\n({n_std} đường, màu xanh lá)"],
     ):
         ax.imshow(img)
         ax.set_title(title, fontsize=11)

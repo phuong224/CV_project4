@@ -6,7 +6,9 @@ model_path = os.path.join(base_dir, "..", "results", "models")
 
 os.makedirs(model_path, exist_ok=True)
 
+# Load model 1 lần duy nhất khi import module
+_model = YOLO(os.path.join(model_path, "yolov8n.pt"))
+
 def run_object_detection(img_path):
-    model = YOLO(os.path.join(model_path, "yolov8n.pt"))
-    results = model(img_path)
+    results = _model(img_path)
     return results[0]
