@@ -28,7 +28,6 @@ share/python-wheels/
 
 notebooks/.ipynb_checkpoints
 venv/
-results/
 # Environments
 .env
 .venv

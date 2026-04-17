@@ -3,11 +3,11 @@ import numpy as np
 import math
 
 
-def detect_edges(img_gray, low_thresh=60, high_thresh=150):
+def detect_edges(img_gray, low_thresh=50, high_thresh=180):
     edges = cv2.Canny(img_gray, low_thresh, high_thresh)
     return edges
 
-def get_lines (edges_img, threshold=80, minLineLength=110, maxLineGap=80):
+def get_lines (edges_img, threshold=70, minLineLength=80, maxLineGap=80):
     return cv2.HoughLinesP(
         edges_img, 
         1, 
@@ -39,7 +39,7 @@ def filter_lines_by_length(lines, min_len=60, max_len=600):
 def apply_roi_mask(img, upper_limit=0.4):
     """
     Che đi phần trên của ảnh.
-    upper_limit: Tỷ lệ phần trên muốn che (0.5 = 50%).
+    upper_limit: Tỷ lệ phần trên muốn che (0.4 = 40%).
     """
     mask = np.zeros_like(img)
     height, width = img.shape[:2]
@@ -59,7 +59,7 @@ def apply_roi_mask(img, upper_limit=0.4):
     return masked_image
 
 
-def filter_lines_by_angle(lines, min_angle=5, max_angle=80):
+def filter_lines_by_angle(lines, min_angle=20, max_angle=80):
     """
     Lọc các đường thẳng dựa trên góc nghiêng (độ).
     min_angle, max_angle: Khoảng góc muốn giữ lại (ví dụ 20 đến 80 độ).
